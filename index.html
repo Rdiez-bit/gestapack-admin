@@ -254,8 +254,10 @@ function parseRows(json) {
     cv:  col('Costo Venta Total','costo venta'),
   };
 
+  const EXCLUIR_VD = ['ALVARO AMENABAR','CESAR LEPIN','PEDRO AVILA','RAIMUNDO DIEZ'];
   return json
     .filter(row => DOCS_VALIDOS.includes(String(row[C.doc]||'').trim()))
+    .filter(row => !EXCLUIR_VD.includes(normVd(String(row[C.vd]||'').trim())))
     .map(row => {
       const fecha = parseDate(C.f ? row[C.f] : '');
       if (!fecha) return null;
