@@ -106,9 +106,9 @@ tr:hover td{background:var(--surface2);}
   <div class="tab" onclick="showTab('v0')">Andrés Toledo</div>
   <div class="tab" onclick="showTab('v1')">Benjamín Diez</div>
   <div class="tab" onclick="showTab('v2')">Carolina Nicoletti</div>
-  <div class="tab" onclick="showTab('v4')">Ignacio del Solar</div>
-  <div class="tab" onclick="showTab('v5')">Manuela Gámez</div>
-  <div class="tab" onclick="showTab('v6')">Ricardo Saldías</div>
+  <div class="tab" onclick="showTab('v3')">Ignacio del Solar</div>
+  <div class="tab" onclick="showTab('v4')">Manuela Gámez</div>
+  <div class="tab" onclick="showTab('v5')">Ricardo Saldías</div>
   <div class="tab" onclick="showTab('an')">Anual</div>
 </div>
 <main>
@@ -120,7 +120,6 @@ tr:hover td{background:var(--surface2);}
   <div id="panel-v3" class="panel"><div id="v3-c"><div class="empty"><h3>Sin datos</h3></div></div></div>
   <div id="panel-v4" class="panel"><div id="v4-c"><div class="empty"><h3>Sin datos</h3></div></div></div>
   <div id="panel-v5" class="panel"><div id="v5-c"><div class="empty"><h3>Sin datos</h3></div></div></div>
-  <div id="panel-v6" class="panel"><div id="v6-c"><div class="empty"><h3>Sin datos</h3></div></div></div>
   <div id="panel-an" class="panel"><div id="an-c"><div class="empty"><h3>Sin datos</h3></div></div></div>
   <div style="display:none"><div id="mc-c"></div><div id="t20-c"></div><div id="mt-c"></div><div id="vv-c"></div></div>
 </main>
@@ -149,7 +148,7 @@ const MR = [
   {m:13,l:'Bajo',     c:'bj'},
   {m:0, l:'Crítico',  c:'bc'},
 ];
-const TABS = ['mm','v0','v1','v2','v3','v4','v5','v6','an'];
+const TABS = ['mm','v0','v1','v2','v3','v4','v5','an'];
 
 // ═══════════════════════════════════════════════════
 // ESTADO
@@ -582,7 +581,10 @@ function renderMM() {
 // VENDEDORES
 // ═══════════════════════════════════════════════════
 function renderVendedores() {
-  const VD_KEYS = Object.keys(VC).sort((a,b)=>VC[a].s.localeCompare(VC[b].s,'es'));
+  // Excluir Empresa — no tiene pestaña propia en el portal vendedores
+  const VD_KEYS = Object.keys(VC)
+    .filter(k => k !== 'EMPRESA')
+    .sort((a,b)=>VC[a].s.localeCompare(VC[b].s,'es'));
   VD_KEYS.forEach((vk, idx) => renderVendedor(vk, 'v'+idx));
 }
 
