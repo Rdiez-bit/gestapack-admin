@@ -484,6 +484,15 @@ function renderMC() {
 // ═══════════════════════════════════════════════════
 // MES MÓVIL
 // ═══════════════════════════════════════════════════
+function diasHabiles2(desde, hasta) {
+  const FER=['2026-01-01','2026-04-03','2026-04-04','2026-05-01','2026-05-21',
+    '2026-06-29','2026-07-16','2026-08-15','2026-09-18','2026-09-19','2026-10-12',
+    '2026-10-31','2026-11-01','2026-12-08','2026-12-25'];
+  let n=0, d=new Date(desde);
+  while(d<=hasta){const dow=d.getDay();const k=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');if(dow!==0&&dow!==6&&!FER.includes(k))n++;d=new Date(d.getTime()+86400000);}
+  return n;
+}
+
 function renderMM() {
   const {i,f,label,mesKey}=getMM();
   const rows=fp(DATA,i,f);
@@ -554,8 +563,8 @@ function renderMM() {
   h+='<div class="tw"><table><thead><tr>';
   h+='<th>Vendedor</th><th>Zona</th><th class="r">Venta Neta</th><th class="r">Contrib $</th>';
   h+='<th class="r">Margen %</th>';
-  h+='<th class="r">Cumplimiento %</th><th style="min-width:130px">Progreso</th>';
-  h+='<th class="r">Contrib/KG</th><th class="r">Clientes</th>';
+  h+='<th class="r">Cumplimiento %</th><th class="r">Proyección Cierre</th>';
+  h+='<th class="r">Venta Prom/Día</th><th class="r">SKUs</th><th class="r">Contrib/KG</th><th class="r">Clientes</th>';
   h+='</tr></thead><tbody>';
 
   byV.forEach(v=>{
@@ -569,8 +578,21 @@ function renderMM() {
     h+='<td class="r">'+fCLP(v.tl)+'</td>';
     h+='<td class="r" style="font-family:var(--fh);font-weight:700">'+fCLP(v.mc)+'</td>';
     h+='<td class="r">'+mb(v.pct)+'</td>';
+    // Proyección cierre
+    const vDias = agByDay(fp(DATA,i,f), v.k);
+    const dTrans2 = vDias.length;
+    const ritmo2 = dTrans2>0 ? v.mc/dTrans2 : 0;
+    const dTot2 = diasHabiles2(i,f);
+    const proy2 = ritmo2 * dTot2;
+    const pctProy2 = meta>0 ? (proy2/meta*100) : null;
+    const ppStr = pctProy2!==null ? pctProy2.toFixed(1)+'%' : '—';
+    const ppCol = pctProy2!==null ? pc(pctProy2) : 'var(--muted)';
+    // Venta promedio diaria
+    const ventaProm = dTrans2>0 ? v.tl/dTrans2 : 0;
     h+='<td class="r" style="font-family:var(--fh);font-weight:700;color:'+(pn2!==null?pc(pn2):'var(--muted)')+'">'+ps+'</td>';
-    h+='<td>'+(meta>0?pb(v.mc,meta):'')+'</td>';
+    h+='<td class="r" style="font-family:var(--fh);font-weight:700;color:'+ppCol+'">'+ppStr+'</td>';
+    h+='<td class="r">'+fCLP(ventaProm)+'</td>';
+    h+='<td class="r">'+v.sk+'</td>';
     h+='<td class="r">'+fCLP(v.cpk)+'</td>';
     h+='<td class="r">'+v.cl+'</td>';
     h+='</tr>';
