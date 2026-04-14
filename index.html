@@ -604,6 +604,21 @@ function renderMM() {
 // ═══════════════════════════════════════════════════
 // VENDEDORES
 // ═══════════════════════════════════════════════════
+function getSemanasMovil(i, f) {
+  const semanas = [];
+  let inicio = new Date(i);
+  while (inicio <= f) {
+    let fin = new Date(inicio);
+    do { fin.setDate(fin.getDate()+1); } while (fin.getDay() !== 4 && fin <= f);
+    if (fin > f) { fin = new Date(f); }
+    else { fin.setHours(23,59,59,999); }
+    semanas.push({ i: new Date(inicio), f: new Date(fin) });
+    inicio = new Date(fin.getTime() + 86400000);
+    inicio.setHours(0,0,0,0);
+  }
+  return semanas;
+}
+
 function renderVendedores() {
   // Excluir Empresa — no tiene pestaña propia en el portal vendedores
   const VD_KEYS = Object.keys(VC)
@@ -679,7 +694,29 @@ function renderVendedor(vdKey, panelId) {
 
   // Tabla días
   if(dias.length){
-    h += '<div class="st">Detalle por Día</div>';
+    // Tabla resumen por semana
+  const semanas = getSemanasMovil(i, f);
+  h += '<div class="st">Resumen por Semana</div>';
+  h += '<div class="tw"><table><thead><tr>';
+  h += '<th>Semana</th><th class="r">Venta Neta</th><th class="r">Contrib $</th><th class="r">Margen %</th><th class="r">Contrib/KG</th><th class="r">Clientes</th><th class="r">SKUs</th>';
+  h += '</tr></thead><tbody>';
+  semanas.forEach((s, idx) => {
+    const sr = fp(DATA, s.i, s.f).filter(r => r.vdKey === vdKey);
+    const sa = ag(sr);
+    const lbl = 'S'+(idx+1)+' '+s.i.toLocaleDateString('es-CL',{day:'numeric',month:'short'})+' → '+s.f.toLocaleDateString('es-CL',{day:'numeric',month:'short'});
+    h += '<tr>';
+    h += '<td style="font-weight:600">'+lbl+'</td>';
+    h += '<td class="r">'+fCLP(sa.tl)+'</td>';
+    h += '<td class="r" style="color:var(--green);font-weight:600">'+fCLP(sa.mc)+'</td>';
+    h += '<td class="r">'+mb(sa.pct)+'</td>';
+    h += '<td class="r">'+fCLP(sa.cpk)+'</td>';
+    h += '<td class="r">'+sa.cl+'</td>';
+    h += '<td class="r">'+sa.sk+'</td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+
+  h += '<div class="st">Detalle por Día</div>';
     h += '<div class="tw"><table><thead><tr>';
     h += '<th>Día</th><th class="r">Venta Neta</th><th class="r">Contribución $</th><th class="r">Margen %</th><th class="r">Contrib/KG</th><th class="r">Clientes</th>';
     h += '</tr></thead><tbody>';
